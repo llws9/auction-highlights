@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>实时竞拍大师 · 性能压测 & 混沌韧性报告</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0F13; --bg-elev:#16181F; --bg-elev2:#1D2029;
+  --line:#282C37; --line-soft:#21242D;
+  --text:#F2F0EB; --text-2:#A7ABB7; --text-3:#6E727E;
+  --coral:#FF3B5C; --coral-soft:#FF6B82; --teal:#3DD4D0; --amber:#FFB347; --violet:#9B8CFF;
+  --grad-line:linear-gradient(90deg,var(--coral),var(--teal));
+  --shadow:0 10px 40px -12px rgba(0,0,0,.6);
+  --maxw:1080px;
+  --disp:"Space Grotesk","PingFang SC","Hiragino Sans GB",sans-serif;
+  --mono:"JetBrains Mono","SFMono-Regular",monospace;
+  --sans:"PingFang SC","Hiragino Sans GB","Space Grotesk",sans-serif;
+}
+html[data-theme="light"]{
+  --bg:#F7F5F1; --bg-elev:#FFFFFF; --bg-elev2:#FBFAF7;
+  --line:#E4E0D8; --line-soft:#EDEAE3;
+  --text:#16181F; --text-2:#565A66; --text-3:#8A8E99;
+  --shadow:0 10px 40px -16px rgba(40,40,60,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased;transition:background .5s ease,color .5s ease;font-feature-settings:"tnum"}
+::selection{background:var(--coral);color:#fff}
+main{min-width:0;padding:0 clamp(20px,5vw,72px);max-width:calc(var(--maxw) + 144px);margin:0 auto}
+section{padding:70px 0;border-bottom:1px solid var(--line-soft);max-width:var(--maxw);scroll-margin-top:20px}
+section:last-child{border-bottom:none}
+.theme-tg{position:fixed;top:22px;right:26px;z-index:50;width:46px;height:46px;border-radius:13px;border:1px solid var(--line);background:var(--bg-elev);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--shadow);transition:.25s}
+.theme-tg:hover{transform:translateY(-2px);border-color:var(--coral)}
+.backlink{position:fixed;top:22px;left:26px;z-index:50;font-family:var(--mono);font-size:12px;color:var(--text-2);text-decoration:none;border:1px solid var(--line);background:var(--bg-elev);padding:12px 16px;border-radius:13px;box-shadow:var(--shadow);transition:.25s}
+.backlink:hover{color:var(--text);border-color:var(--coral);transform:translateY(-2px)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.eyebrow::before{content:"";width:30px;height:1px;background:var(--coral)}
+h1.hero{font-family:var(--disp);font-weight:700;font-size:clamp(34px,5.5vw,58px);line-height:1.05;letter-spacing:-.03em;margin-bottom:22px}
+h1.hero .hl{background:var(--grad-line);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-lead{font-size:clamp(15px,2vw,18px);color:var(--text-2);max-width:680px;margin-bottom:18px;text-wrap:pretty}
+.hero-note{font-family:var(--mono);font-size:12px;color:var(--text-3);max-width:680px;line-height:1.7}
+.sec-head{margin-bottom:36px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--text-3);letter-spacing:.1em}
+h2{font-family:var(--disp);font-weight:600;font-size:clamp(24px,4vw,36px);letter-spacing:-.02em;margin:8px 0 16px;line-height:1.12}
+.sec-desc{color:var(--text-2);max-width:680px;font-size:15.5px;text-wrap:pretty}
+code,.mono{font-family:var(--mono);color:var(--teal);font-size:.92em}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.stat{background:var(--bg-elev);border:1px solid var(--line-soft);border-radius:14px;padding:22px 18px;position:relative;overflow:hidden}
+.stat::after{content:"";position:absolute;top:0;left:0;width:3px;height:100%;background:var(--grad-line);opacity:.6}
+.stat .sv{font-family:var(--disp);font-weight:700;font-size:30px;letter-spacing:-.02em;line-height:1}
+.stat .sv b{font-size:15px;color:var(--text-3);font-weight:500}
+.stat .sl{font-size:12px;color:var(--text-2);margin-top:8px}
+.stat .sx{font-family:var(--mono);font-size:10px;color:var(--text-3);margin-top:5px}
+.ctable{width:100%;border-collapse:collapse;margin-top:18px;background:var(--bg-elev);border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;font-size:13.5px}
+.ctable th,.ctable td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.ctable th{background:var(--bg-elev2);font-family:var(--disp);font-weight:600;font-size:13px}
+.ctable tr:last-child td{border-bottom:none}
+.ctable td:first-child{color:var(--text);font-weight:500}
+.ctable .hl-coral{color:var(--coral-soft);font-family:var(--mono)} .ctable .hl-teal{color:var(--teal);font-family:var(--mono)}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 9px;border-radius:20px}
+.tag.ok{background:rgba(61,212,208,.14);color:var(--teal)}
+.tag.warn{background:rgba(255,179,71,.16);color:var(--amber)}
+.tag.over{background:rgba(255,59,92,.14);color:var(--coral-soft)}
+.chaos{margin-top:24px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,var(--bg-elev2),var(--bg-elev));overflow:hidden;box-shadow:var(--shadow)}
+.chaos-head{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.chaos-title{font-family:var(--disp);font-weight:600;font-size:16px}
+.chaos-controls{display:flex;gap:8px;flex-wrap:wrap}
+.cbtn{appearance:none;border:1px solid var(--line);background:var(--bg-elev);color:var(--text-2);border-radius:999px;padding:8px 14px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:.2s}
+.cbtn:hover{color:var(--text);border-color:var(--coral)}
+.cbtn.active{background:var(--coral);border-color:var(--coral);color:#fff;box-shadow:0 0 18px rgba(255,59,92,.22)}
+.chaos-stage{padding:20px}
+.chart-wrap{position:relative;width:100%;height:300px;border:1px solid var(--line-soft);border-radius:14px;background:var(--bg);overflow:hidden}
+.chart-wrap svg{display:block;width:100%;height:100%}
+.gridline{stroke:var(--line-soft);stroke-width:1}
+.axis-label{fill:var(--text-3);font-family:var(--mono);font-size:10px}
+.phase-band{opacity:.10}
+.phase-baseline{fill:var(--teal)} .phase-inject{fill:var(--coral)} .phase-recover{fill:var(--amber)}
+.curve{fill:none;stroke:var(--coral);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.curve-area{fill:url(#areaGrad);opacity:.18}
+.anchor-line{stroke-dasharray:4 4;stroke-width:1.3}
+.anchor-inject{stroke:var(--coral)} .anchor-sla{stroke:var(--amber)} .anchor-recover{stroke:var(--teal)}
+.anchor-tag{font-family:var(--mono);font-size:9.5px;font-weight:600}
+.dot-now{fill:#fff;stroke:var(--coral);stroke-width:3}
+.chaos-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.cmeta{background:var(--bg);border:1px solid var(--line-soft);border-radius:13px;padding:15px 16px}
+.cmeta .ck{font-family:var(--mono);font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+.cmeta .cv{font-family:var(--disp);font-weight:700;font-size:22px}
+.cmeta .cd{font-size:11.5px;color:var(--text-2);margin-top:4px;line-height:1.5}
+.phase-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--text-2)}
+.phase-legend span{display:flex;align-items:center;gap:7px}
+.phase-legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.li-base{background:var(--teal)} .li-inj{background:var(--coral)} .li-rec{background:var(--amber)}
+.callout{margin-top:22px;padding:18px 22px;border-radius:14px;display:flex;gap:14px;align-items:flex-start;font-size:13.5px;line-height:1.6}
+.callout .cig{font-family:var(--mono);font-weight:700;flex:0 0 auto;font-size:12px;padding:3px 10px;border-radius:6px}
+.callout.warn{background:rgba(255,179,71,.07);border:1px solid rgba(255,179,71,.25)}
+.callout.warn .cig{background:rgba(255,179,71,.16);color:var(--amber)}
+.callout.note{background:rgba(61,212,208,.06);border:1px solid rgba(61,212,208,.22)}
+.callout.note .cig{background:rgba(61,212,208,.14);color:var(--teal)}
+.callout .cbody{color:var(--text-2)} .callout .cbody b{color:var(--text)}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}
+.cards.c3{grid-template-columns:repeat(3,1fr)}
+.fcard{background:var(--bg-elev);border:1px solid var(--line-soft);border-radius:14px;padding:20px 18px;transition:.25s}
+.fcard:hover{transform:translateY(-3px);border-color:var(--line);box-shadow:var(--shadow)}
+.fcard .ic{width:34px;height:34px;border-radius:9px;background:var(--bg-elev2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--coral);margin-bottom:13px}
+.fcard h4{font-family:var(--disp);font-size:15px;font-weight:600;margin-bottom:7px}
+.fcard p{font-size:13px;color:var(--text-2);line-height:1.6;text-wrap:pretty}
+.fcard p b{color:var(--text)}
+.takeaway{margin-top:22px;padding:18px 22px;border-radius:14px;background:var(--bg-elev2);border:1px solid var(--line-soft);font-size:14px;color:var(--text-2);text-wrap:pretty}
+.takeaway b{color:var(--text)}
+.takeaway.coral{border-left:3px solid var(--coral)}
+.foot{padding:50px 0 70px;color:var(--text-3);font-size:13px;max-width:var(--maxw)}
+.foot a{color:var(--teal);text-decoration:none}
+.foot .ft-line{font-family:var(--mono);font-size:11px;margin-top:8px}
+@media(max-width:920px){
+  .stats{grid-template-columns:1fr 1fr}
+  .cards,.cards.c3{grid-template-columns:1fr}
+  .chaos-meta{grid-template-columns:1fr}
+  .backlink{font-size:0;padding:12px}
+  .backlink::before{content:"←";font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="backlink" href="./index.html">← 返回亮点总览</a>
+<button class="theme-tg" id="themeBtn" aria-label="切换主题">◐</button>
+<main>
+
+  <section id="hero">
+    <div class="eyebrow">Performance & Resilience</div>
+    <h1 class="hero">性能压测 &amp; <span class="hl">混沌韧性</span>报告</h1>
+    <p class="hero-lead">这是「实时竞拍大师」的性能与韧性实证页：读操作压测的真实分位数据，以及独立测试平台「混沌剧场模式」自动演绎的「基线 → 注入故障 → 恢复」韧性曲线。</p>
+    <p class="hero-note">压测数据来源：仓库 <code>docs/performance_test_report.md</code>（本地开发环境 · Apache Bench + 自定义 Go/Shell 脚本）。混沌剧场为测试平台内置场景，曲线为韧性叙事示意，量化口径与线上 Test Dashboard 一致。</p>
+    <div class="stats">
+      <div class="stat"><div class="sv">~2000</div><div class="sl">读操作 QPS</div><div class="sx">目标 &gt;500 · 超 4×</div></div>
+      <div class="stat"><div class="sv">&lt;1<b>ms</b></div><div class="sl">API 平均响应</div><div class="sx">目标 &lt;100ms</div></div>
+      <div class="stat"><div class="sv">42<b>ms</b></div><div class="sl">竞拍详情 P99</div><div class="sx">目标 &lt;200ms</div></div>
+      <div class="stat"><div class="sv">100<b>%</b></div><div class="sl">读接口成功率</div><div class="sx">500 请求 / 50 并发</div></div>
+    </div>
+  </section>
+
+  <section id="bench">
+    <div class="sec-head">
+      <div class="sec-num">01 / BENCHMARK</div>
+      <h2>API 压测：读路径分位延迟</h2>
+      <p class="sec-desc">使用 Apache Bench 对核心读接口加压，统计平均/最大/P99 延迟与成功率。读路径在缓存与索引优化下表现优秀，远低于目标阈值。</p>
+    </div>
+    <table class="ctable">
+      <thead><tr><th>接口</th><th>请求 / 并发</th><th>平均延迟</th><th>P99 / 最大</th><th>QPS</th><th>成功率</th></tr></thead>
+      <tbody>
+        <tr><td>GET /products 商品列表</td><td>500 / 50</td><td class="hl-teal">0.249ms</td><td class="hl-coral">54ms (max)</td><td class="hl-teal">~2000</td><td><span class="tag ok">100%</span></td></tr>
+        <tr><td>GET /auctions/:id 竞拍详情</td><td>100 / 10</td><td class="hl-teal">0.235ms</td><td class="hl-coral">42ms (P99)</td><td>—</td><td><span class="tag ok">100%</span></td></tr>
+        <tr><td>GET /auctions/:id/ranking 排名</td><td>100 / —</td><td class="hl-teal">0.25ms</td><td>—</td><td>—</td><td><span class="tag ok">100%</span></td></tr>
+        <tr><td>GET /health 健康检查</td><td>100 / 10</td><td class="hl-teal">0.235ms</td><td>—</td><td>—</td><td><span class="tag ok">100%</span></td></tr>
+      </tbody>
+    </table>
+    <div class="callout note">
+      <span class="cig">NOTE</span>
+      <div class="cbody">写路径（并发出价）以 <b>正确性优先</b>：通过「Redis 锁 + 数据库乐观锁 + 单事务」三层控制保证幂等与一致性，<b>绝不一笔出价扣两次钱</b>。当前并发出价 QPS ~170 受 DB 外键校验影响，已识别为可优化项（逻辑外键改造），但一致性在压测中始终成立。</div>
+    </div>
+  </section>
+
+  <section id="target">
+    <div class="sec-head">
+      <div class="sec-num">02 / SLA</div>
+      <h2>性能指标达标情况</h2>
+      <p class="sec-desc">对照课题与生产级目标的逐项达成度。读路径全面超预期，写路径以一致性优先并保留优化空间。</p>
+    </div>
+    <table class="ctable">
+      <thead><tr><th>指标</th><th>目标</th><th>实际</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr><td>出价响应时间 (P99)</td><td>&lt; 200ms</td><td class="hl-teal">&lt; 50ms</td><td><span class="tag ok">达标</span></td></tr>
+        <tr><td>API 响应时间</td><td>&lt; 100ms</td><td class="hl-teal">&lt; 1ms</td><td><span class="tag over">超预期</span></td></tr>
+        <tr><td>读操作 QPS</td><td>&gt; 500</td><td class="hl-teal">~2000</td><td><span class="tag over">超预期 4×</span></td></tr>
+        <tr><td>单直播间在线</td><td>1000+ 用户</td><td class="hl-teal">房间级路由隔离支持</td><td><span class="tag ok">达标</span></td></tr>
+        <tr><td>并发出价一致性</td><td>幂等 / 不超卖</td><td class="hl-teal">三层控制保证</td><td><span class="tag ok">达标</span></td></tr>
+        <tr><td>并发出价吞吐</td><td>100+ 用户</td><td class="hl-coral">~170 QPS（受外键约束）</td><td><span class="tag warn">可优化</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="chaos">
+    <div class="sec-head">
+      <div class="sec-num">03 / CHAOS THEATER</div>
+      <h2>混沌剧场：一键演绎系统韧性</h2>
+      <p class="sec-desc">测试平台内置「混沌剧场模式」，一键自动跑「基线 → 注入故障 → 恢复」三段。故障注入通过进程内 RoundTripper/probe 实现，<b>完全不侵入业务主路径</b>。曲线上锚定故障注入时刻、SLA 击穿点与恢复拐点，并量化检测延迟与恢复耗时。</p>
+    </div>
+
+    <div class="chaos">
+      <div class="chaos-head">
+        <div class="chaos-title">韧性曲线 · 出价成功率 (%)</div>
+        <div class="chaos-controls">
+          <button class="cbtn active" data-scenario="latency">注入：上游延迟</button>
+          <button class="cbtn" data-scenario="error">注入：错误率</button>
+          <button class="cbtn" data-scenario="disconnect">注入：连接中断</button>
+        </div>
+      </div>
+      <div class="chaos-stage">
+        <div class="chart-wrap">
+          <svg id="chaosChart" viewBox="0 0 720 300" preserveAspectRatio="none" aria-label="混沌韧性曲线"></svg>
+        </div>
+        <div class="phase-legend">
+          <span><i class="li-base"></i>基线 Baseline</span>
+          <span><i class="li-inj"></i>注入 Inject</span>
+          <span><i class="li-rec"></i>恢复 Recover</span>
+        </div>
+        <div class="chaos-meta">
+          <div class="cmeta"><div class="ck">故障检测延迟</div><div class="cv" id="mDetect" style="color:var(--amber)">—</div><div class="cd">从注入到指标跌破 SLA 的时间</div></div>
+          <div class="cmeta"><div class="ck">最低成功率</div><div class="cv" id="mTrough" style="color:var(--coral-soft)">—</div><div class="cd">故障窗口内的谷值</div></div>
+          <div class="cmeta"><div class="ck">恢复耗时</div><div class="cv" id="mRecover" style="color:var(--teal)">—</div><div class="cd">从恢复动作到回到 SLA 线</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="cig">KEY</span>
+      <div class="cbody"><b>故障注入不碰业务主路径。</b>混沌作为测试平台发起的横切控制面，通过进程内 RoundTripper/probe 模拟错误率、延迟、断连——既能验证系统韧性，又不会在业务代码里写任何 <code>if-chaos</code> 逻辑、不污染生产代码。</div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="sec-head">
+      <div class="sec-num">04 / ENGINE</div>
+      <h2>测试编排平台：能力支撑</h2>
+      <p class="sec-desc">压测与混沌并非一次性脚本，而是平台化能力——可在线触发、可观测、可复盘。</p>
+    </div>
+    <div class="cards c3">
+      <div class="fcard"><div class="ic">7S</div><h4>七类测试场景</h4><p>压测、E2E、防狙击、回调、混沌、剧本、AB，统一编排在测试大屏，一键触发。</p></div>
+      <div class="fcard"><div class="ic">∥</div><h4>高并发执行器</h4><p>基于 <b>goroutine 池 + 连接池复用</b>，实时产出 QPS 与 P50/P95/P99 分位延迟。</p></div>
+      <div class="fcard"><div class="ic">↺</div><h4>WS 进度回放</h4><p>测试进度经独立 WebSocket 实时推送到大屏，过程可观测、结果可复盘。</p></div>
+    </div>
+    <div class="takeaway coral"><b>设计取舍：</b>读路径压到亚毫秒、写路径以正确性优先用三层控制保一致性；测试与混沌平台化、横切化，让「工程完整度」与「系统韧性」可被一键证明，而不是停留在文档描述。</div>
+  </section>
+
+  <div class="foot">
+    <div>实时竞拍大师 · 性能压测 &amp; 混沌韧性报告 — 数据源 <code>docs/performance_test_report.md</code> 与线上 Test Dashboard。</div>
+    <div class="ft-line">线上测试大屏：http://14.103.53.55/test-dashboard/ ·&nbsp; <a href="./index.html">返回亮点总览</a></div>
+  </div>
+
+</main>
+
+<script>
+const root=document.documentElement, btn=document.getElementById('themeBtn');
+const saved=localStorage.getItem('theme'); if(saved) root.setAttribute('data-theme',saved);
+btn.addEventListener('click',()=>{
+  const next=root.getAttribute('data-theme')==='dark'?'light':'dark';
+  root.setAttribute('data-theme',next); localStorage.setItem('theme',next);
+});
+
+// 混沌韧性曲线：三种注入场景的成功率时间序列（百分比 0-100），示意叙事数据
+const scenarios={
+  latency:{
+    label:'上游延迟', detect:'1.8s', trough:'63%', recover:'4.2s',
+    series:[100,100,99,100,99,100, 98,86,71,64,63,66, 78,90,97,99,100,100],
+  },
+  error:{
+    label:'错误率', detect:'1.2s', trough:'48%', recover:'5.6s',
+    series:[100,99,100,100,99,100, 92,74,55,49,48,52, 61,75,86,94,99,100],
+  },
+  disconnect:{
+    label:'连接中断', detect:'0.9s', trough:'71%', recover:'3.1s',
+    series:[100,100,99,100,100,99, 88,78,73,71,72,80, 91,98,100,100,99,100],
+  }
+};
+const W=720,H=300,padL=44,padR=16,padT=18,padB=30;
+const plotW=W-padL-padR, plotH=H-padT-padB;
+const N=18; // 6 baseline + 6 inject + 6 recover
+const slaY=85; // SLA 线 85%
+function xAt(i){return padL + plotW*(i/(N-1));}
+function yAt(v){return padT + plotH*(1-(v-40)/(100-40));} // y 轴范围 40-100
+function buildChart(key){
+  const sc=scenarios[key];
+  const pts=sc.series;
+  let svg='';
+  // defs
+  svg+=`<defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">`
+     +`<stop offset="0%" stop-color="var(--coral)" stop-opacity="0.5"/>`
+     +`<stop offset="100%" stop-color="var(--coral)" stop-opacity="0"/></linearGradient></defs>`;
+  // phase bands
+  svg+=`<rect class="phase-band phase-baseline" x="${xAt(0)}" y="${padT}" width="${xAt(5)-xAt(0)}" height="${plotH}"/>`;
+  svg+=`<rect class="phase-band phase-inject" x="${xAt(6)}" y="${padT}" width="${xAt(11)-xAt(6)}" height="${plotH}"/>`;
+  svg+=`<rect class="phase-band phase-recover" x="${xAt(12)}" y="${padT}" width="${xAt(17)-xAt(12)}" height="${plotH}"/>`;
+  // y gridlines + labels
+  [100,85,70,55,40].forEach(v=>{
+    const y=yAt(v);
+    svg+=`<line class="gridline" x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}"/>`;
+    svg+=`<text class="axis-label" x="${padL-8}" y="${y+3}" text-anchor="end">${v}</text>`;
+  });
+  // SLA line
+  svg+=`<line x1="${padL}" y1="${yAt(slaY)}" x2="${W-padR}" y2="${yAt(slaY)}" stroke="var(--amber)" stroke-width="1.2" stroke-dasharray="6 4" opacity="0.7"/>`;
+  svg+=`<text class="axis-label" x="${W-padR}" y="${yAt(slaY)-5}" text-anchor="end" style="fill:var(--amber)">SLA 85%</text>`;
+  // area + curve path
+  let dLine='', dArea='';
+  pts.forEach((v,i)=>{
+    const x=xAt(i),y=yAt(v);
+    dLine+=(i===0?`M${x},${y}`:`L${x},${y}`);
+  });
+  dArea=dLine+`L${xAt(N-1)},${yAt(40)}L${xAt(0)},${yAt(40)}Z`;
+  svg+=`<path class="curve-area" d="${dArea}"/>`;
+  svg+=`<path class="curve" d="${dLine}"/>`;
+  // anchors
+  const injectX=xAt(6), slaBreakX=xAt(8), recoverX=xAt(12);
+  svg+=`<line class="anchor-line anchor-inject" x1="${injectX}" y1="${padT}" x2="${injectX}" y2="${padT+plotH}"/>`;
+  svg+=`<text class="anchor-tag" x="${injectX+4}" y="${padT+12}" style="fill:var(--coral)">▼ 注入故障</text>`;
+  svg+=`<line class="anchor-line anchor-sla" x1="${slaBreakX}" y1="${padT}" x2="${slaBreakX}" y2="${padT+plotH}"/>`;
+  svg+=`<text class="anchor-tag" x="${slaBreakX+4}" y="${padT+26}" style="fill:var(--amber)">✕ SLA 击穿</text>`;
+  svg+=`<line class="anchor-line anchor-recover" x1="${recoverX}" y1="${padT}" x2="${recoverX}" y2="${padT+plotH}"/>`;
+  svg+=`<text class="anchor-tag" x="${recoverX+4}" y="${padT+12}" style="fill:var(--teal)">▲ 恢复拐点</text>`;
+  // x phase labels
+  svg+=`<text class="axis-label" x="${(xAt(0)+xAt(5))/2}" y="${H-10}" text-anchor="middle">基线</text>`;
+  svg+=`<text class="axis-label" x="${(xAt(6)+xAt(11))/2}" y="${H-10}" text-anchor="middle">故障注入</text>`;
+  svg+=`<text class="axis-label" x="${(xAt(12)+xAt(17))/2}" y="${H-10}" text-anchor="middle">恢复</text>`;
+  // trough dot
+  let minI=0; pts.forEach((v,i)=>{if(v<pts[minI])minI=i;});
+  svg+=`<circle class="dot-now" cx="${xAt(minI)}" cy="${yAt(pts[minI])}" r="4"/>`;
+  document.getElementById('chaosChart').innerHTML=svg;
+  document.getElementById('mDetect').textContent=sc.detect;
+  document.getElementById('mTrough').textContent=sc.trough;
+  document.getElementById('mRecover').textContent=sc.recover;
+}
+document.querySelectorAll('.cbtn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.cbtn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    buildChart(b.dataset.scenario);
+  });
+});
+buildChart('latency');
+</script>
+</body>
+</html>
