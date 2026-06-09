@@ -244,9 +244,10 @@ html[data-theme="light"] .liveux-stage::before{background:
     <a class="navlink" href="#observe"><span class="ix">12</span>可观测性</a>
     <a class="navlink" href="#metrics"><span class="ix">13</span>业务指标体系</a>
     <a class="navlink" href="#quality"><span class="ix">14</span>工程质量</a>
+    <a class="navlink" href="#skills"><span class="ix">15</span>自创 Skills</a>
     <div class="nav-group">设计 &amp; 边界</div>
-    <a class="navlink" href="#homeredesign"><span class="ix">15</span>首页维度重构</a>
-    <a class="navlink" href="#boundary"><span class="ix">16</span>如实边界说明</a>
+    <a class="navlink" href="#homeredesign"><span class="ix">16</span>首页维度重构</a>
+    <a class="navlink" href="#boundary"><span class="ix">17</span>如实边界说明</a>
   </nav>
 
   <main>
@@ -581,8 +582,15 @@ error_codes={<span class="grn">"400":7095</span>}  <span class="dim"># 仅余业
         <div class="fcard"><div class="ic">FE</div><h4>前端工程化完整</h4><p>H5 与 Admin 各自维护独立 Design Token（颜色/动画/间距/圆角/字体），支持深浅双主题语义 token；组件按 shared 通用层与业务层分层，配 ErrorBoundary 与全局错误上报。</p></div>
         <div class="fcard"><div class="ic">UX</div><h4>交互细节打磨</h4><p>排行榜前三高亮、领先/被超状态胶囊、游戏化出价飘屏、双击红心爆发、快捷弹幕、5 秒沉浸倒计时、流拍消散动画，以及出价成功震动反馈等均有落地。</p></div>
       </div>
-      <h4 style="font-family:var(--disp);font-size:16px;margin:34px 0 0">开发流程沉淀：把高频人工经验做成自创 Skills</h4>
-      <p class="sec-desc" style="margin-top:8px">项目不只沉淀业务代码，也把反复发生的开发、部署、设计与协作流程固化为可复用 agent skill。价值不是“命令别名”，而是把安全门禁、状态记录、验证证据和交付口径标准化。</p>
+    </section>
+
+    <!-- 15 SKILLS -->
+    <section id="skills">
+      <div class="sec-head">
+        <div class="sec-num">15 / 自创 Skills 与开发流程资产</div>
+        <h2>把高频人工经验，沉淀成可复用的开发协议</h2>
+        <p class="sec-desc">项目不只沉淀业务代码，也把反复发生的开发、部署、设计与协作流程固化为可复用 agent skill。价值不是“命令别名”，而是把安全门禁、状态记录、验证证据和交付口径标准化。</p>
+      </div>
       <div class="cards c3">
         <div class="fcard"><div class="ic">DEV</div><h4><code>/dp-dev</code> · 本地强重启</h4><p>把本地 macOS 开发环境重启流程产品化：固定从 <code>origin/main</code> 拉起，统一清理旧进程、检查端口和容器状态，并避免为绕过本机问题修改主干配置。</p></div>
         <div class="fcard"><div class="ic">PRO</div><h4><code>/dp-prod</code> · Demo 线上部署</h4><p>线上变更前必须先输出部署计划、目标提交、风险和回滚点；只有用户明确确认后才执行 apply，并通过 H5/Admin/API/容器状态完成验证。</p></div>
@@ -598,10 +606,10 @@ error_codes={<span class="grn">"400":7095</span>}  <span class="dim"># 仅余业
       </div>
     </section>
 
-    <!-- 15 HOME REDESIGN -->
+    <!-- 16 HOME REDESIGN -->
     <section id="homeredesign">
       <div class="sec-head">
-        <div class="sec-num">15 / 设计亮点</div>
+        <div class="sec-num">16 / 设计亮点</div>
         <h2>H5 首页维度重构：从「竞拍维度」到「直播间维度」</h2>
         <p class="sec-desc">一次以第一性原理驱动的信息架构重构：不打补丁，而是追问「首页到底该回答用户什么问题」，从根上修正列表维度错配。</p>
       </div>
@@ -648,10 +656,10 @@ error_codes={<span class="grn">"400":7095</span>}  <span class="dim"># 仅余业
       <div class="takeaway coral"><b>低成本高收益：</b>复用既有 RPC 批量回填模式（参照 <code>GetCurrentByLiveStreamIDs</code>），不跨库 JOIN；feed 形态零改动，改造成本集中在首页。</div>
     </section>
 
-    <!-- 16 BOUNDARY -->
+    <!-- 17 BOUNDARY -->
     <section id="boundary">
       <div class="sec-head">
-        <div class="sec-num">16 / 如实边界说明</div>
+        <div class="sec-num">17 / 如实边界说明</div>
         <h2>主动界定已完成与未完成的边界</h2>
         <p class="sec-desc">以下属于「能力已部分实现但主流程未接通」或「当前确实不存在」的范围，答辩与文档中按现状描述，避免把局部实现表述成完整闭环。</p>
       </div>
