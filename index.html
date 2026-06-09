@@ -274,7 +274,7 @@ html[data-theme="light"] .liveux-stage::before{background:
         <div class="arch-row">
           <div class="node"><div class="nt">用户端 H5</div><div class="nd">frontend/h5</div></div>
           <div class="node"><div class="nt">管理端 Admin</div><div class="nd">frontend/admin</div></div>
-          <div class="node"><div class="nt">测试编排平台</div><div class="nd">test-dashboard</div></div>
+          <div class="node"><div class="nt">测试编排平台</div><div class="nd">test-dashboard · chaos/control plane</div></div>
           <div class="node"><div class="nt">日志端</div><div class="nd">Loki+Promtail</div></div>
           <div class="node"><div class="nt">大盘端</div><div class="nd">Grafana</div></div>
         </div>
@@ -282,13 +282,14 @@ html[data-theme="light"] .liveux-stage::before{background:
         <div class="arch-row" style="grid-template-columns:1fr">
           <div class="node gw"><div class="nt">gateway-service · 8080</div><div class="nd">JWT 鉴权 / 路由 / 限流 / 实验预评估</div></div>
         </div>
+        <div class="arch-band">↘ &nbsp; 故障注入控制面：Test Dashboard → test-service / chaos scenario → RoundTripper probe → Gateway/API &nbsp; ↙</div>
         <div class="svc-row">
           <div class="svc"><div class="nt">product</div><div class="nd">8081 · 商品/统计</div></div>
           <div class="svc"><div class="nt">auction</div><div class="nd">8082 · 竞拍/一口价</div></div>
           <div class="svc"><div class="nt">auction-ws</div><div class="nd">8083 · 实时同步</div></div>
         </div>
       </div>
-      <div class="takeaway">课题基线只要求两端闭环，本项目交付的是一套含独立测试编排平台（自带 1920×1080 演示大屏）与 Loki+Grafana 可观测栈的生产级微服务系统。</div>
+      <div class="takeaway">课题基线只要求两端闭环，本项目交付的是一套含独立测试编排平台（自带 1920×1080 演示大屏）与 Loki+Grafana 可观测栈的生产级微服务系统。<b>故障注入不侵入业务服务主路径</b>，而是在 <code>test-service</code> 的 <code>chaos scenario</code> 中通过进程内 probe / <code>RoundTripper</code> 模拟错误率、延迟与断连，再把基线-注入-恢复三段结果回流到测试大屏。</div>
     </section>
 
     <!-- 02 CONCURRENCY -->
