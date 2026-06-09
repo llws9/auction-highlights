@@ -580,6 +580,21 @@ error_codes={<span class="grn">"400":7095</span>}  <span class="dim"># 仅余业
         <div class="fcard"><div class="ic">FE</div><h4>前端工程化完整</h4><p>H5 与 Admin 各自维护独立 Design Token（颜色/动画/间距/圆角/字体），支持深浅双主题语义 token；组件按 shared 通用层与业务层分层，配 ErrorBoundary 与全局错误上报。</p></div>
         <div class="fcard"><div class="ic">UX</div><h4>交互细节打磨</h4><p>排行榜前三高亮、领先/被超状态胶囊、游戏化出价飘屏、双击红心爆发、快捷弹幕、5 秒沉浸倒计时、流拍消散动画，以及出价成功震动反馈等均有落地。</p></div>
       </div>
+      <h4 style="font-family:var(--disp);font-size:16px;margin:34px 0 0">开发流程沉淀：把高频人工经验做成自创 Skills</h4>
+      <p class="sec-desc" style="margin-top:8px">项目不只沉淀业务代码，也把反复发生的开发、部署、设计与协作流程固化为可复用 agent skill。价值不是“命令别名”，而是把安全门禁、状态记录、验证证据和交付口径标准化。</p>
+      <div class="cards c3">
+        <div class="fcard"><div class="ic">DEV</div><h4><code>/dp-dev</code> · 本地强重启</h4><p>把本地 macOS 开发环境重启流程产品化：固定从 <code>origin/main</code> 拉起，统一清理旧进程、检查端口和容器状态，并避免为绕过本机问题修改主干配置。</p></div>
+        <div class="fcard"><div class="ic">PRO</div><h4><code>/dp-prod</code> · Demo 线上部署</h4><p>线上变更前必须先输出部署计划、目标提交、风险和回滚点；只有用户明确确认后才执行 apply，并通过 H5/Admin/API/容器状态完成验证。</p></div>
+        <div class="fcard"><div class="ic">SDD</div><h4><code>/sdd-run</code> · 状态驱动开发</h4><p>把复杂开发拆成 plan/tasks/state 三件套：状态文件是 SSOT，任务声明 write-set、依赖、验证命令和 regression sentinel，防止并行开发互相回滚。</p></div>
+        <div class="fcard"><div class="ic">UI3</div><h4><code>/ui-design-trio</code> · 三版 UI 决策</h4><p>把 UI 设计评审流程标准化：先扫描主题与真实 token，再产出三版差异化方案；预览 URL 必须探活，且保留同源单文件 HTML 兜底，避免“服务不可用”。</p></div>
+      </div>
+      <div class="flow">
+        <div class="fcell"><div class="fk">经验出现</div><div class="ft">重复排障 / 重复评审</div><div class="fd">部署、SDD 执行、三版 UI 选择都是高频人工流程，靠口头记忆会产生遗漏。</div></div>
+        <div class="farr">→</div>
+        <div class="fcell"><div class="fk">协议固化</div><div class="ft">Skill + Runbook + State</div><div class="fd">把前置检查、用户确认、任务边界、验证证据和失败处理写入 skill。</div></div>
+        <div class="farr">→</div>
+        <div class="fcell"><div class="fk">复用收益</div><div class="ft">稳定交付 / 可审计</div><div class="fd">新任务不再从零组织流程，交付过程可复盘、可验证、可持续改进。</div></div>
+      </div>
     </section>
 
     <!-- 15 HOME REDESIGN -->
