@@ -228,7 +228,13 @@ html[data-theme="light"] .liveux-stage::before{background:
 .glitch-count{position:absolute;z-index:2;left:50%;top:46%;transform:translate(-50%,-50%);font-family:var(--disp);font-size:76px;font-weight:700;color:var(--coral);text-shadow:-3px 0 var(--teal),3px 0 var(--violet);animation:glitchFloat 1.6s ease-in-out infinite}
 .liveux-dock{position:absolute;z-index:2;left:14px;right:14px;bottom:16px;border-radius:20px;border:1px solid rgba(255,255,255,.14);background:rgba(15,17,24,.78);backdrop-filter:blur(18px);padding:14px;color:#fff}
 .lead-capsule{display:inline-flex;align-items:center;gap:7px;margin-bottom:9px;padding:5px 10px;border-radius:999px;background:rgba(255,179,71,.18);color:var(--amber);font-size:11px;font-family:var(--mono);border:1px solid rgba(255,179,71,.34)}
-.dock-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.dock-price{font-family:var(--disp);font-size:26px;font-weight:700;color:#fff}.dock-heat{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.66);white-space:nowrap;overflow:hidden}
+.dock-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.dock-price{font-family:var(--disp);font-size:26px;font-weight:700;color:#fff}
+.dock-heatbar{position:relative;margin-top:4px;width:178px;height:24px;border-radius:999px;overflow:hidden;border:1px solid rgba(255,179,71,.26);background:rgba(255,255,255,.07);box-shadow:inset 0 0 18px rgba(255,255,255,.04),0 0 18px rgba(255,59,92,.10);font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.88);display:flex;align-items:center;justify-content:space-between;padding:0 9px}
+.dock-heatbar::before{content:"";position:absolute;inset:0;transform-origin:left;transform:scaleX(.66);background:linear-gradient(90deg,rgba(255,179,71,.82),rgba(255,59,92,.88),rgba(255,107,130,.74));border-radius:999px;filter:drop-shadow(0 0 12px rgba(255,59,92,.35));animation:heatPulse 1.9s ease-in-out infinite}
+.dock-heatbar::after{content:"";position:absolute;inset:-48% -30%;background:linear-gradient(110deg,transparent 34%,rgba(255,255,255,.44) 48%,transparent 62%);transform:translateX(-72%);animation:heatSweep 2.4s ease-in-out infinite;opacity:.42}
+.dock-heatbar span{position:relative;z-index:2;text-shadow:0 1px 8px rgba(0,0,0,.38);white-space:nowrap}
+.dock-heatbar .heat-level{font-weight:700;letter-spacing:.02em;color:#fff}
+.dock-heatbar .heat-meta{color:rgba(255,255,255,.72);transform:scale(.92);transform-origin:right center}
 .quick-chat{margin-top:11px;display:flex;gap:7px;overflow:hidden}.quick-chat span{font-size:10px;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12);white-space:nowrap}
 .liveux-points{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .liveux-points .fcard{margin:0}.liveux-points .ic{color:var(--teal)}
@@ -236,6 +242,8 @@ html[data-theme="light"] .liveux-stage::before{background:
 @keyframes floatIn{0%,100%{transform:translateX(0);opacity:.9}50%{transform:translateX(18px);opacity:1}}
 @keyframes heartPop{0%{transform:scale(.5) translateY(12px);opacity:0}35%{opacity:1}100%{transform:scale(1.25) translateY(-54px);opacity:0}}
 @keyframes glitchFloat{0%{opacity:0;transform:translate(-50%,8%) scale(.72)}35%{opacity:1;transform:translate(-50%,-50%) scale(1)}70%{opacity:1;filter:none}100%{opacity:0;transform:translate(-50%,-58%) scale(1.08);filter:blur(6px)}}
+@keyframes heatPulse{50%{filter:drop-shadow(0 0 18px rgba(255,59,92,.55));transform:scaleX(.72)}}
+@keyframes heatSweep{0%,18%{transform:translateX(-72%)}72%,100%{transform:translateX(72%)}}
 @keyframes skillShine{0%,18%{transform:translateX(-70%)}70%,100%{transform:translateX(70%)}}
 @media(prefers-reduced-motion:reduce){.liveux-stage *,.skill-demo *{animation:none!important}}
 .foot{padding:50px 0 70px;color:var(--text-3);font-size:13px;max-width:var(--maxw)}
@@ -475,7 +483,10 @@ html[data-theme="light"] .liveux-stage::before{background:
             <div class="dock-row">
               <div>
                 <div class="dock-price">¥12,800</div>
-                <div class="dock-heat">战况升温 · 8 人出价 · 1,246 人围观</div>
+                <div class="dock-heatbar" aria-label="战况热度条">
+                  <span class="heat-level">战况升温</span>
+                  <span class="heat-meta">8 出价 · 1.2k 围观</span>
+                </div>
               </div>
               <div class="liveux-pill">VIBE ON</div>
             </div>
