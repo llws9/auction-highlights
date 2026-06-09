@@ -369,6 +369,15 @@ html[data-theme="light"] .liveux-stage::before{background:
         <div class="fcard"><div class="ic">TH</div><h4>高频广播可控</h4><p>前端按类型节流（<code>rank_update</code> 200ms / <code>bid_placed</code> 100ms），服务端排名广播同样窗口节流，并通过房间归属校验避免消息串台。</p></div>
       </div>
       <div class="takeaway">目标不是单纯「把数据推到前端」，而是让实时链路具备「可连接、可恢复、可控广播」的完整工程闭环，而非只能在理想网络下工作的演示级实现。</div>
+
+      <div class="fcard" style="margin-top:14px"><h4 style="font-size:16px;color:var(--coral-soft)">真实复盘 · 高频出价下抽屉价格滞后导致出价失败</h4>
+        <p style="margin-top:6px">线上演示连续触发并发出价后，出价抽屉显示当前价 <b>¥440</b>，用户按 ¥450 出价持续失败，最终成交价却是 <b>¥460</b> —— 说明抽屉读到的是过期价格。这是一次真实暴露「实时推送」与「价格一致性」边界的线上问题。</p>
+        <div class="psv" style="margin-top:14px">
+          <div class="pc p"><div class="pl">Problem</div><div class="pt">并发压测瞬间把后端最高价从 440 抬到 460，但 H5 出价抽屉的 <code>current_price</code> 主要依赖 WebSocket 增量推送；高频点击下 WS 末态可能延迟或漏更，抽屉据旧价算出的最低加价（¥450）已低于真实最低价（¥460），出价必然被服务端拒绝。</p></div>
+          <div class="pc s"><div class="pl">Solution</div><div class="pt">不把一致性押在 WS 单一通道：新增 demo 竞拍同步事件 <code>demoAuctionEvents</code>，<code>DemoConsole</code> 在并发压测成功后广播后端返回的权威 <code>highest_amount</code>；<code>LiveRoomSlide</code> 监听该事件，对 <code>current_price</code> 做<b>单调向上修正</b>并即时刷新抽屉 <code>minBid/bidAmount</code>。</p></div>
+          <div class="pc v"><div class="pl">Value</div><div class="pt">把「实时推送」与「价格一致性」解耦：WS 负责低延迟体验，权威事件兜底最终一致，抽屉报价始终不低于服务端真实最高价。补 2 个回归测试，<code>npm test</code> 66 通过、<code>build</code> 通过，浏览器实测抽屉价格随后端最高价同步刷新。</p></div>
+        </div>
+      </div>
     </section>
 
     <!-- 04 TEST PLATFORM -->
